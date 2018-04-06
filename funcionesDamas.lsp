@@ -63,8 +63,8 @@
    ((or (= (sixth node) 0) (win (third node))) (setf (car (fifth node)) (getScore (third node))))
    ((> (car (fifth node)) (second (fifth node))))
    (t (getMoves node)(loop for x in possibleMoves
-			   do (setf (car (fifth x)) (car (fifth node)) (second (fifth x)) (second (fifth node))) (minMove x) (if (> (second (fifth x)) (car (fifth node))) (setf (car (fifth node)) (second (fifth x))))
-		      )
+			   do (setf (car (fifth x)) (car (fifth node)) (second (fifth x)) (second (fifth node))) (minMove x) (if (> (second (fifth x)) (car (fifth node))) (setf (car (fifth node)) (second (fifth x))))) (setq bestMove (find-if #'(lambda (x) (= (car (fifth node)) (second (fifth x)))) possbileMoves))
+
     )
   )
 )
@@ -75,8 +75,7 @@
    ((or (= (sixth node) 0) (win (third node))) (setf (car (fifth node)) (getScore (third node))))
    ((> (car (fifth node)) (second (fifth node))))
    (t (getMoves node)(loop for x in possibleMoves
-			   do (setf (car (fifth x)) (car (fifth node)) (second (fifth x)) (second (fifth node))) (maxMove x) (if (< (car (fifth x)) (second (fifth node))) (setf (second (fifth node)) (car (fifth x))))
-			   )
+			   do (setf (car (fifth x)) (car (fifth node)) (second (fifth x)) (second (fifth node))) (maxMove x) (if (< (car (fifth x)) (second (fifth node))) (setf (second (fifth node)) (car (fifth x))))) (setq bestMove (find-if #'(lambda (x) (= (second (fifth node)) (car (fifth x)))) possbileMoves))
     )
   )
 )
