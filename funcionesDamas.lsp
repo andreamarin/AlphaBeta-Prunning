@@ -44,3 +44,50 @@
 (defun checkSpace(n state)
     (cdr (nthcdr n state))
 )
+
+
+;; minimax con alpha-beta prunning, recibe la profundidad máxima como parámetro y crea el nodo inicial
+;; Los valores de alpha y beta iniciales son -1000 y 1000 pues el score del tablero va de -? a ?
+;; Cuando alpha es mayor que beta entonces se hace prunning, es decir, ya no se expande ese nodo.
+
+;;variables globales para minimax-ab
+(setq bestMove nil possibleMoves nil)
+
+(defun minimax-ab (max-depth)
+  (maxMove (list 0 -1 currentSate 0 '(-1000 1000) max-depth))
+)
+
+;; simula las decisiones del jugador (maximiza)
+(defun maxMove (node)
+ (cond 
+   ((or (= (sixth node) 0) (win (third node))) (setf (car (fifth node)) (getScore (third node))))
+   ((> (car (fifth node)) (second (fifth node))))
+   (t (getMoves node)(loop for x in possibleMoves
+			   do (setf (car (fifth x)) (car (fifth node)) (second (fifth x)) (second (fifth node))) (minMove x) (if (> (second (fifth x)) (car (fifth node))) (setf (car (fifth node)) (second (fifth x))))
+		      )
+    )
+  )
+)
+
+;; simula decisiones del oponente (minimiza)
+(defun minMove (node)
+ (cond 
+   ((or (= (sixth node) 0) (win (third node))) (setf (car (fifth node)) (getScore (third node))))
+   ((> (car (fifth node)) (second (fifth node))))
+   (t (getMoves node)(loop for x in possibleMoves
+			   do (setf (car (fifth x)) (car (fifth node)) (second (fifth x)) (second (fifth node))) (maxMove x) (if (< (car (fifth x)) (second (fifth node))) (setf (second (fifth node)) (car (fifth x))))
+			   )
+    )
+  )
+)
+
+
+;; crea una lista con todos los "hijos" del nodo dado
+(defun getMoves(node)
+  (setq possibleMoves nil i (car node) sates (getNextStates (third node)))
+  (loop for x in states 
+	do (push possibleMoves (list (incf i) (car node) (car x) (second x) '(0,0) (- (sixth node) 1)))
+  )
+)
+
+
