@@ -50,42 +50,38 @@
 ;; Los valores de alpha y beta iniciales son -1000 y 1000 pues el score del tablero va de -? a ?
 ;; Cuando alpha es mayor que beta entonces se hace prunning, es decir, ya no se expande ese nodo.
 
-;;variables globales para minimax-ab
-(setq bestMove nil possibleMoves nil)
+;; nodos son de la forma (ID IDPAPA state move bestValue depth)
+
+;;se trabaja con alpha y beta como variables globales 
+
+
+(setq bestMove nil possibleMoves nil,alpha -1000 beta 1000)
 
 (defun minimax-ab (max-depth)
-  (maxMove (list 0 -1 currentSate 0 '(-1000 1000) max-depth))
+  (maxMove (list 0 -1 currentSate 0 nil max-depth) -1000 1000)
 )
 
 ;; simula las decisiones del jugador (maximiza)
-(defun maxMove (node)
+(defun maxMove (node, alpha, beta)
  (cond 
-   ((or (= (sixth node) 0) (win (third node))) (setf (car (fifth node)) (getScore (third node))))
-   ((> (car (fifth node)) (second (fifth node))))
-   (t (getMoves node)(loop for x in possibleMoves
-			   do (setf (car (fifth x)) (car (fifth node)) (second (fifth x)) (second (fifth node))) (minMove x) (if (> (second (fifth x)) (car (fifth node))) (setf (car (fifth node)) (second (fifth x))))) (setq bestMove (find-if #'(lambda (x) (= (car (fifth node)) (second (fifth x)))) possbileMoves))
-
-    )
+   ((or (= (sixth node) 0) (win (third node))) (setf (fifth node) (getScore (third node))))
+   (t (setf (fifth node) -1000) (getMoves node) (loop for x in possibleMoves do (when (< (fifth node) beta) (minMove x (fifth node) beta) (setf (fifth node) (max (fifth node) (fifth x)))))(setq bestMove (find-if #'(lambda (x) (= (fifth node) (fifth x))) possbileMoves)))
   )
 )
-
-;; simula decisiones del oponente (minimiza)
-(defun minMove (node)
+      
+      
+(defun minMove (node, alpha, beta)
  (cond 
-   ((or (= (sixth node) 0) (win (third node))) (setf (car (fifth node)) (getScore (third node))))
-   ((> (car (fifth node)) (second (fifth node))))
-   (t (getMoves node)(loop for x in possibleMoves
-			   do (setf (car (fifth x)) (car (fifth node)) (second (fifth x)) (second (fifth node))) (maxMove x) (if (< (car (fifth x)) (second (fifth node))) (setf (second (fifth node)) (car (fifth x))))) (setq bestMove (find-if #'(lambda (x) (= (second (fifth node)) (car (fifth x)))) possbileMoves))
-    )
+   ((or (= (sixth node) 0) (win (third node))) (setf (fifth node) (getScore (third node))))
+   (t (setf (fifth node) 1000) (getMoves node) (loop for x in possibleMoves do (when (> (fifth node) alpha) (minMove x alpha (fifth node)) (setf (fifth node) (min (fifth node) (fifth x)))))(setq bestMove (find-if #'(lambda (x) (= (fifth node) (fifth x))) possbileMoves)))
   )
 )
-
 
 ;; crea una lista con todos los "hijos" del nodo dado
 (defun getMoves(node)
   (setq possibleMoves nil i (car node) sates (getNextStates (third node)))
   (loop for x in states 
-	do (push possibleMoves (list (incf i) (car node) (car x) (second x) '(0,0) (- (sixth node) 1)))
+	do (push possibleMoves (list (incf i) (car node) (car x) (second x) nil (- (sixth node) 1)))
   )
 )
 
