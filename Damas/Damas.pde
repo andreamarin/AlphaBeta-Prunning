@@ -1,3 +1,7 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.util.Scanner;
+
 // Colors: 
 /*
 Green {0, 155, 0};
@@ -25,7 +29,7 @@ int[] board;
 boolean pTurn = true;
 //int[] canMove;
 int activePeg = -1;
-boolean twoPlayers = true;
+boolean twoPlayers = false;
 
 int selectedPeg = -1;
 
@@ -309,8 +313,10 @@ void mouseClicked(){
   drawBoard();
   
   if(!twoPlayers && !pTurn){
-   // println("Lisp Plays...  " + getAIMove());
+    try{
+     println("Lisp Plays...  " + getAIMove());
     //pTurn = true;
+    }catch(IOException e){println(e);}  
   }
   
   if(gameOver()){ 
@@ -323,9 +329,26 @@ void mouseClicked(){
 
 String getAIMove() throws IOException{
   Runtime rt = Runtime.getRuntime();
-  Process pr = rt.exec("clisp");
+  String[] cmd = {"/bin/ksh", "/Users/alex/Documents/6Semestre/AI/Tarea3/run2.sh"};
+  //String[] cmd = {"echo", "$PATH"};
+  //String[] env = {"PATH=null"};
+  Process pr = rt.exec(cmd);
+  //Process process = Runtime.getRuntime().exec(your Arraycommand)
   OutputStream stdin = pr.getOutputStream();
   InputStream stdout = pr.getInputStream(); 
+  BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
+  
+  //writer.write("(setq ans 7)");
+  //writer.write("ans");
+  writer.flush();
+  writer.close();
+  
+  Scanner scan = new Scanner(stdout);
+  while(scan.hasNextLine()){
+    println(scan.nextLine());
+  }
+  scan.close();
+ 
   pr.destroy();
   return "1x1";
 }
