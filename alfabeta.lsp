@@ -8,4 +8,4 @@
                      :direction :output
                      :if-exists :supersede
                      :if-does-not-exist :create)
-  (format str (write-to-string (fourth bestMove))) )
+  (format str (write-to-string (fourth bm))) )
