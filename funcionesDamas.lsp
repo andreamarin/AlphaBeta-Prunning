@@ -1,9 +1,9 @@
 ;; Los estados son de la forma ((0 . x) (1 . x) (2 . x) ... (31 . x))
-;; nodos son de la forma (ID IDPAPA state move bestValue depth)
+;; nodos son de la forma (ID IDPAPA state move bestValue  depth)
 ;; 1 - Ficha Roja, 3 - Rey Rojo, 0 - Vacio, -1 - Ficha Negra, -3 - Rey Negro
 ;; Rojos primero
 ;; State inicial : 
-(setq st0 '(( 0 .  1) ( 1 .  1) ( 2 .  1) ( 3 .  1) ( 4 .  1) ( 5 .  1) ( 6 .  1) ( 7 .  1) ( 8 .  1) ( 9 .  1) (10 .  1) (11 .  1) (12 .  0) (13 .  0) (14 .  0) (15 .  0) (16 .  0) (17 .  0) (18 .  0) (19 .  0) (20 . -1) (21 . -1) (22 . -1) (23 . -1) (24 . -1) (25 . -1) (26 . -1) (27 . -1) (28 . -1) (29 . -1) (30 . -1) (31 . -1) ))
+(setq st0 '(( 0 .  1) ( 1 .  1) ( 2 .  1) ( 3 .  1) ( 4 .  1) ( 5 .  1) ( 6 .  1) ( 7 .  1) ( 8 .  1) ( 9 .  1) (10 .  1) (11 .  1) (12 .  0) (13 .  0) (14 .  0) (15 .  0) (16 .  0) (17 .  0) (18 .  -1) (19 .  0) (20 . -1) (21 . -1) (22 . 0) (23 . -1) (24 . -1) (25 . -1) (26 . -1) (27 . -1) (28 . -1) (29 . -1) (30 . -1) (31 . -1) ))
 ;;                  ( 0 .  1) ( 1 .  1) ( 2 .  1) ( 3 .  1) 
 ;;                ( 4 .  1) ( 5 .  1) ( 6 .  1) ( 7 .  1)
 ;;                  ( 8 .  1) ( 9 .  1) (10 .  1) (11 .  1)
@@ -505,33 +505,34 @@
 ;; Cuando alpha es mayor que beta entonces se hace prunning, es decir, ya no se expande ese nodo.
 ;;se trabaja con alpha, beta, bestMove y possibleMoves como variables globales 
 
-(setq bestMove nil possibleMoves nil alpha -1000 beta 1000 id 0)
+(setq possibleMoves nil alpha -1000 beta 1000 id 0)
 
 (defun minimax-ab (state max-depth)
-  (maxMove (list id -1 state 0 nil max-depth) -1000 1000)
+  (setq bm (maxMove (list id -1 state 0 nil max-depth) -1000 1000))
 
 )
 
 ;; simula las decisiones del jugador (maximiza)
 (defun maxMove (node alpha beta)
+   (let ((bestMove nil)) 
   (cond 
    ((= (sixth node) 0) (setf (fifth node) (getScore (third node))))
-   (t (setf (fifth node) -1000) (getMoves node t) (loop for x in possibleMoves do (when (< (fifth node) beta) (minMove x (fifth node) beta) (setf (fifth node) (max (fifth node) (fifth x))) (when (= (fifth node) (fifth x)) (setq bestMove x)))))
-   )
+   (t (setf (fifth node) -1000) (getMoves node t) (loop for x in possibleMoves do (when (< (fifth node) beta) (minMove x (fifth node) beta) (setf (fifth node) (max (fifth node) (fifth x))) (when (= (fifth node) (fifth x)) (setq bestMove x)))) bestMove )
+   ))
 )
       
 ;; simula las decisiones del oponente (minimiza)      
 (defun minMove (node alpha beta)
+  (let ((bestMove nil))
  (cond 
    ((= (sixth node) 0) (setf (fifth node) (getScore (third node))))
-   (t (setf (fifth node) 1000) (getMoves node nil) (loop for x in possibleMoves do (when (> (fifth node) alpha) (maxMove x alpha (fifth node)) (setf (fifth node) (min (fifth node) (fifth x))) (when (= (fifth node) (fifth x)) (setq bestMove x)))))
-   )
+   (t (setf (fifth node) 1000) (getMoves node nil) (loop for x in possibleMoves do (when (> (fifth node) alpha) (maxMove x alpha (fifth node)) (setf (fifth node) (min (fifth node) (fifth x))) (when (= (fifth node) (fifth x)) (setq bestMove x)))) bestMove )
+   ))
 )
 
 ;; crea una lista con todos los "hijos" del nodo dado
 ;; trabaja con possibleMoves como variable global
 (defun getMoves(node isMax)
-  ;;(print id)
   (setq possibleMoves '() moves (if isMax (getRedMoves (third node)) (getBlkMoves (third node))) states (mapcar #'(lambda (x) (applyMove (third node) x)) moves) nextStates (mapcar #'(lambda (x y) (list x y)) states moves)) 
   (loop for x in nextStates do (push (list (incf id) (car node) (car x) (second x) nil (- (sixth node) 1)) possibleMoves)
   )
@@ -549,6 +550,6 @@
 )
 
 
-(minimax-ab st2 4)
-(print bestMove)
+(minimax-ab st0 4)
+(print bm)
 ;;(print (fourth bestMove))
