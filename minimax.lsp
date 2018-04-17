@@ -26,3 +26,4 @@
 	do (push possibleMoves (list (incf i) (car node) (car x) (second x) 0 (- (sixth node) 1)))
   )
 )
+

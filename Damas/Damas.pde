@@ -36,6 +36,13 @@ import java.util.Scanner;
 PShape crown;
 int[] board;
 int activePeg = -1;
+<<<<<<< HEAD
+=======
+boolean twoPlayers = false;
+
+int depth = 4;
+
+>>>>>>> 72d16b52fd947154e312ac9b5260939e6ca03724
 int selectedPeg = -1;
 int[][][] diagonals;
 Runtime rt = Runtime.getRuntime();
@@ -319,6 +326,27 @@ void mouseClicked(){
     }
   }
   drawBoard();
+<<<<<<< HEAD
+=======
+  
+  if(!twoPlayers && !pTurn){
+    try{
+      String m = getAIMove();
+     println("Lisp Plays...  " + m);
+     moveAI(m);
+     pTurn = true;
+     drawBoard();
+
+    }catch(IOException e){println(e);}  
+  }
+  
+  if(gameOver()){ 
+    noLoop();
+    println("\n\n\n=================\n+++++++++++++++++");
+    println("   "+(pTurn ? "RED ":"BLUE")+" WINS!!");
+    println("+++++++++++++++++\n=================");
+  }
+>>>>>>> 72d16b52fd947154e312ac9b5260939e6ca03724
 }
 
 void moveAI(int m, int n){
@@ -352,8 +380,18 @@ String boardToLisp(){
 String getAIMove() throws IOException{
   
   String lispBoard = boardToLisp();
+<<<<<<< HEAD
   String[] cmd = {"/usr/local/bin/clisp", "alphabeta.lsp", str(depth[pTurn?0:1]), lispBoard, (players==1 || !pTurn) ?"T":"Nil"};
   Process pr = rt.exec(cmd, null, new File(path));
+=======
+  
+  Runtime rt = Runtime.getRuntime();
+
+  String[] cmd = {"/usr/local/bin/clisp", "/Users/alex/Documents/6Semestre/AI/Tarea3/alphabeta.lsp", str(depth), lispBoard};
+  //String[] cmd = {"echo", "$PATH"};
+  //String[] env = {"PATH=null"};
+  Process pr = rt.exec(cmd);
+>>>>>>> 72d16b52fd947154e312ac9b5260939e6ca03724
 
   InputStream stdout = pr.getInputStream(); 
 
@@ -361,7 +399,12 @@ String getAIMove() throws IOException{
   String ans = "";
   while(scan.hasNextLine()){
     ans = scan.nextLine();
+<<<<<<< HEAD
     //print(ans);
+=======
+    println(ans);
+
+>>>>>>> 72d16b52fd947154e312ac9b5260939e6ca03724
   }
   scan.close();
  
