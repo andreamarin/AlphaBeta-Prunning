@@ -4,7 +4,7 @@
 ;; Rojos primero
 ;; State inicial : 
 
-;;(setq st0 '(( 0 .  1) ( 1 .  1) ( 2 .  1) ( 3 .  1) ( 4 .  1) ( 5 .  1) ( 6 .  1) ( 7 .  1) ( 8 .  1) ( 9 .  1) (10 .  1) (11 .  1) (12 .  0) (13 .  0) (14 .  0) (15 .  0) (16 .  0) (17 .  0) (18 .  0) (19 .  0) (20 . -1) (21 . -1) (22 . -1) (23 . -1) (24 . -1) (25 . -1) (26 . -1) (27 . -1) (28 . -1) (29 . -1) (30 . -1) (31 . -1) ))
+;(setq st0 '(( 0 .  1) ( 1 .  1) ( 2 .  1) ( 3 .  1) ( 4 .  1) ( 5 .  1) ( 6 .  1) ( 7 .  1) ( 8 .  1) ( 9 .  1) (10 .  1) (11 .  1) (12 .  0) (13 .  0) (14 .  0) (15 .  0) (16 .  0) (17 .  0) (18 .  0) (19 .  0) (20 . -1) (21 . -1) (22 . -1) (23 . -1) (24 . -1) (25 . -1) (26 . -1) (27 . -1) (28 . -1) (29 . -1) (30 . -1) (31 . -1) ))
 
 ;;                  ( 0 .  1) ( 1 .  1) ( 2 .  1) ( 3 .  1) 
 ;;                ( 4 .  1) ( 5 .  1) ( 6 .  1) ( 7 .  1)
@@ -521,8 +521,11 @@
    (let ((bestMove nil)) 
   (cond 
    ((= (sixth node) 0) (setf (fifth node) (getScore (third node))))
-   (t (setf (fifth node) -1000) (getMoves node t) (loop for x in possibleMoves do (when (< (fifth node) beta) (minMove x (fifth node) beta) (setf (fifth node) (max (fifth node) (fifth x))) (when (= (fifth node) (fifth x)) (setq bestMove x)))) bestMove )
+   (t (setf (fifth node) -1000) (getMoves node t) (cond
+						    ((= (length possibleMoves) 0) (setf (fifth node) (getScore (third node))))
+						    (t (loop for x in possibleMoves do (when (< (fifth node) beta) (minMove x (fifth node) beta) (setf (fifth node) (max (fifth node) (fifth x))) (when (= (fifth node) (fifth x)) (setq bestMove x)))) bestMove ))
    ))
+  )
 )
       
 ;; simula las decisiones del oponente (minimiza)      
@@ -530,8 +533,11 @@
   (let ((bestMove nil))
  (cond 
    ((= (sixth node) 0) (setf (fifth node) (getScore (third node))))
-   (t (setf (fifth node) 1000) (getMoves node nil) (loop for x in possibleMoves do (when (> (fifth node) alpha) (maxMove x alpha (fifth node)) (setf (fifth node) (min (fifth node) (fifth x))) (when (= (fifth node) (fifth x)) (setq bestMove x)))) bestMove )
+   (t (setf (fifth node) 1000) (getMoves node nil) (cond
+						     ((= (length possibleMoves) 0) (setf (fifth node) (getScore (third node))))
+						     (t (loop for x in possibleMoves do (when (> (fifth node) alpha) (maxMove x alpha (fifth node)) (setf (fifth node) (min (fifth node) (fifth x))) (when (= (fifth node) (fifth x)) (setq bestMove x)))) bestMove ))
    ))
+ )
 )
 
 ;; crea una lista con todos los "hijos" del nodo dado
