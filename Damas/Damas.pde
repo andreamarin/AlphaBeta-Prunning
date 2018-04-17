@@ -11,11 +11,9 @@ Blue2 {20, 90, 170}
 Yellow  {250,200,0}
 Red {230,0,40}
 Crown {230,230,50}
-
 Wightish {240, 240, 240}
 Black {10, 10, 10}
 Blackish {70, 50, 70}
-
 */
 
 int[] C1 = {230,0,40}; //LISP_PEG
@@ -31,9 +29,14 @@ boolean pTurn = true;
 int activePeg = -1;
 boolean twoPlayers = false;
 
+int depth = 6;
+
 int selectedPeg = -1;
+boolean numbering = true;
 
 int[][][] diagonals;
+
+String path = "D:/Repos/Inteligencia-Artificial/Tarea3";
 
 void drawBoard(){
   int x;
@@ -48,6 +51,10 @@ void drawBoard(){
       fill(C4[0], C4[1], C4[2]);
     }
     rect(x*50,y*50,50,50);
+    fill(0);
+    //textSize(8);
+    if(numbering && (x+y)%2==1)
+      text(str(i/2), x*50+2, y*50+8);
   }
   for(int i = 0; i < 32; i++){
     y = i/4;
@@ -314,8 +321,12 @@ void mouseClicked(){
   
   if(!twoPlayers && !pTurn){
     try{
-     println("Lisp Plays...  " + getAIMove());
-    //pTurn = true;
+      String m = getAIMove();
+     println("Lisp Plays...  " + m);
+     moveAI(m);
+     pTurn = true;
+     drawBoard();
+
     }catch(IOException e){println(e);}  
   }
   
@@ -327,35 +338,72 @@ void mouseClicked(){
   }
 }
 
+void moveAI(String moves_){
+  String[] moves = moves_.replace(".","").replace("  "," ").split(" ");
+  moves[0] = moves[0].substring(1);
+  moves[moves.length-1] = moves[moves.length-1].replace(")", "");
+  for(int i = 0; i<moves.length-1; i++){
+    int m = int(moves[i]);
+    int n = int(moves[i+1]);
+    println("moving from "+m+" to "+n);
+    for(int j = 0; j < 4; j++){
+      int[] diag = diagonals[m][j];
+      boolean in = false;
+      for(int d = 0; d<min(diag.length,2); d++){
+        if(diag[d] == n){
+          in = true;
+          break;
+        }
+      }
+      if(in){
+        move(m, diag[0], board, true);
+        move(diag[0], n, board, true); // does nothing if not eating
+        break;
+      }
+    }
+  }
+}
+
+String boardToLisp(){
+   String s = "(";
+   for(int i = 0; i < 32; i++){
+     s+="("+str(i)+" . "+str(board[i])+")";
+   }
+   s+=")";
+   return s;
+}
+
 String getAIMove() throws IOException{
+  
+  String lispBoard = boardToLisp();
+  
   Runtime rt = Runtime.getRuntime();
-  String[] cmd = {"clisp", "C:/Users/Mike/Desktop/test.cl"};
+
+  String[] cmd = {"clisp", "alphabeta.lsp", str(depth), lispBoard, "t"};
   //String[] cmd = {"echo", "$PATH"};
   //String[] env = {"PATH=null"};
-  Process pr = rt.exec(cmd);
-  //Process process = Runtime.getRuntime().exec(your Arraycommand)
-  OutputStream stdin = pr.getOutputStream();
+  Process pr = rt.exec(cmd, null, new File(path));
+
   InputStream stdout = pr.getInputStream(); 
-  BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
-  
-  //writer.write("(setq ans 7)");
-  //writer.write("ans");
-  writer.flush();
-  writer.close();
-  
+
   Scanner scan = new Scanner(stdout);
+  String ans = "";
   while(scan.hasNextLine()){
-    println(scan.nextLine());
+    ans = scan.nextLine();
+    println(ans);
+
   }
   scan.close();
  
   pr.destroy();
-  return "1x1";
+  return ans;
 }
 
 void setup(){
   size(400,400);
   background(255);
+  
+  textSize(8);
   
   crown = createShape();
   crown.beginShape();
@@ -947,7 +995,6 @@ class Peg{
     return m;
   }
 }
-
 void move(Peg p, int pos){
   int y = p.pos/4;
   int x = (p.pos%4)*2 + (y+1)%2;
@@ -966,7 +1013,6 @@ void move(Peg p, int pos){
   
   drawPeg(p);
 }
-
 boolean occupied(int pos){
   for(int i = 0; i < 8; i++){
     if(redP[i].pos == pos){
@@ -978,12 +1024,10 @@ boolean occupied(int pos){
   }
   return false;
 }
-
 int[] posToCoord(int pos){
   int[] xy = {pos,};
   return xy;
 }
-
 void drawPeg(Peg p){
   int y = p.pos/4;
   int x = (p.pos%4)*2 + (y+1)%2;
