@@ -30,7 +30,7 @@ boolean pTurn = true;
 //int[] canMove;
 int activePeg = -1;
 boolean twoPlayers = false;
-
+int depth = 6;
 int selectedPeg = -1;
 
 int[][][] diagonals;
@@ -314,7 +314,9 @@ void mouseClicked(){
   
   if(!twoPlayers && !pTurn){
     try{
-     println("Lisp Plays...  " + getAIMove());
+      String m = getAIMove();
+     println("Lisp Plays...  " + m);
+     moveAI(m);
     //pTurn = true;
     }catch(IOException e){println(e);}  
   }
@@ -327,9 +329,47 @@ void mouseClicked(){
   }
 }
 
+void moveAI(String moves_){
+  String[] moves = moves_.split(" . ");
+  moves[0] = moves[0].substring(1);
+  moves[moves.length-1] = moves[moves.length-1].replace(")", "");
+  for(int i = 0; i<moves.length-1; i++){
+    int m = int(moves[i]);
+    int n = int(moves[i+1]);
+    println("moving from "+m+"to"+n);
+    for(int j = 0; j < 4; j++){
+      int[] diag = diagonals[m][j];
+      boolean in = false;
+      for(int d = 0; d<min(diag.length,2); d++){
+        if(diag[d] == n){
+          in = true;
+          break;
+        }
+      }
+      if(in){
+        move(m, diag[0], board, true);
+        move(diag[0], n, board, true); // does nothing if not eating
+        break;
+      }
+    }
+  }
+}
+
+String boardToLisp(){
+   String s = str(depth)+"\n(";
+   for(int i = 0; i < 32; i++){
+     s+="("+str(i)+" . "+str(board[i])+")";
+   }
+   s+=")";
+   return s;
+}
+
 String getAIMove() throws IOException{
+  
+  String lispBoard = boardToLisp();
+  
   Runtime rt = Runtime.getRuntime();
-  String[] cmd = {"/bin/ksh", "/Users/alex/Documents/6Semestre/AI/Tarea3/run2.sh"};
+  String[] cmd = {"sh", "/Users/alex/Documents/6Semestre/AI/Tarea3/run.sh", "lispBoard"};
   //String[] cmd = {"echo", "$PATH"};
   //String[] env = {"PATH=null"};
   Process pr = rt.exec(cmd);
@@ -350,7 +390,7 @@ String getAIMove() throws IOException{
   scan.close();
  
   pr.destroy();
-  return "1x1";
+  //return "1x1";
 }
 
 void setup(){
