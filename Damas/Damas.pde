@@ -30,8 +30,9 @@ boolean pTurn = true;
 //int[] canMove;
 int activePeg = -1;
 boolean twoPlayers = false;
-int depth = 6;
+int depth = 4;
 int selectedPeg = -1;
+boolean numbering = true;
 
 int[][][] diagonals;
 
@@ -48,6 +49,10 @@ void drawBoard(){
       fill(C4[0], C4[1], C4[2]);
     }
     rect(x*50,y*50,50,50);
+    fill(0);
+    //textSize(8);
+    if(numbering && (x+y)%2==1)
+      text(str(i/2), x*50+2, y*50+8);
   }
   for(int i = 0; i < 32; i++){
     y = i/4;
@@ -317,7 +322,8 @@ void mouseClicked(){
       String m = getAIMove();
      println("Lisp Plays...  " + m);
      moveAI(m);
-    //pTurn = true;
+     pTurn = true;
+     drawBoard();
     }catch(IOException e){println(e);}  
   }
   
@@ -330,13 +336,13 @@ void mouseClicked(){
 }
 
 void moveAI(String moves_){
-  String[] moves = moves_.split(" . ");
+  String[] moves = moves_.replace(".","").replace("  "," ").split(" ");
   moves[0] = moves[0].substring(1);
   moves[moves.length-1] = moves[moves.length-1].replace(")", "");
   for(int i = 0; i<moves.length-1; i++){
     int m = int(moves[i]);
     int n = int(moves[i+1]);
-    println("moving from "+m+"to"+n);
+    println("moving from "+m+" to "+n);
     for(int j = 0; j < 4; j++){
       int[] diag = diagonals[m][j];
       boolean in = false;
@@ -356,7 +362,7 @@ void moveAI(String moves_){
 }
 
 String boardToLisp(){
-   String s = str(depth)+"\n(";
+   String s = "(";
    for(int i = 0; i < 32; i++){
      s+="("+str(i)+" . "+str(board[i])+")";
    }
@@ -369,33 +375,30 @@ String getAIMove() throws IOException{
   String lispBoard = boardToLisp();
   
   Runtime rt = Runtime.getRuntime();
-  String[] cmd = {"sh", "/Users/alex/Documents/6Semestre/AI/Tarea3/run.sh", "lispBoard"};
+  String[] cmd = {"/usr/local/bin/clisp", "/Users/alex/Documents/6Semestre/AI/Tarea3/alphabeta.lsp", str(depth), lispBoard};
   //String[] cmd = {"echo", "$PATH"};
   //String[] env = {"PATH=null"};
   Process pr = rt.exec(cmd);
-  //Process process = Runtime.getRuntime().exec(your Arraycommand)
-  OutputStream stdin = pr.getOutputStream();
+
   InputStream stdout = pr.getInputStream(); 
-  BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
-  
-  //writer.write("(setq ans 7)");
-  //writer.write("ans");
-  writer.flush();
-  writer.close();
-  
+
   Scanner scan = new Scanner(stdout);
+  String ans = "";
   while(scan.hasNextLine()){
-    println(scan.nextLine());
+    ans = scan.nextLine();
+    println(ans);
   }
   scan.close();
  
   pr.destroy();
-  //return "1x1";
+  return ans;
 }
 
 void setup(){
   size(400,400);
   background(255);
+  
+  textSize(8);
   
   crown = createShape();
   crown.beginShape();
