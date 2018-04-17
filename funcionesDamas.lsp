@@ -509,9 +509,11 @@
 
 (setq possibleMoves nil alpha -1000 beta 1000 id 0)
 
-(defun minimax-ab (state max-depth)
-  (setq bm (maxMove (list id -1 state 0 nil max-depth) -1000 1000))
-
+(defun minimax-ab (state max-depth asRed)
+    (if asRed 
+        (setq bm (maxMove (list id -1 state 0 nil max-depth) -1000 1000))
+        (setq bm (minMove (list id -1 state 0 nil max-depth) -1000 1000))
+    )
 )
 
 ;; simula las decisiones del jugador (maximiza)
