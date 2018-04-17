@@ -30,7 +30,9 @@ boolean pTurn = true;
 //int[] canMove;
 int activePeg = -1;
 boolean twoPlayers = false;
+
 int depth = 4;
+
 int selectedPeg = -1;
 boolean numbering = true;
 
@@ -324,6 +326,7 @@ void mouseClicked(){
      moveAI(m);
      pTurn = true;
      drawBoard();
+
     }catch(IOException e){println(e);}  
   }
   
@@ -375,6 +378,7 @@ String getAIMove() throws IOException{
   String lispBoard = boardToLisp();
   
   Runtime rt = Runtime.getRuntime();
+
   String[] cmd = {"/usr/local/bin/clisp", "/Users/alex/Documents/6Semestre/AI/Tarea3/alphabeta.lsp", str(depth), lispBoard};
   //String[] cmd = {"echo", "$PATH"};
   //String[] env = {"PATH=null"};
@@ -387,6 +391,7 @@ String getAIMove() throws IOException{
   while(scan.hasNextLine()){
     ans = scan.nextLine();
     println(ans);
+
   }
   scan.close();
  
