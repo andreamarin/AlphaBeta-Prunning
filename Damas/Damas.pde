@@ -1,10 +1,10 @@
 
-int[] depth = {3,3}; // blue, red
+int[] depth = {2, 6}; // blue, red
 String[] names = {"BLUE", "HAL"}; // blue, red
-boolean pTurn = false; //blue starts
-int players = 0;
+boolean pTurn = true; //blue starts
+int players = 1;
 boolean numbering = true;
-String path = "/Users/alex/Documents/6Semestre/AI/Tarea3";
+String path = "D:/Repos/Inteligencia-Artificial/Tarea3";
 
 
 // Colors: 
@@ -46,8 +46,6 @@ Runtime rt = Runtime.getRuntime();
 String[] AImoves = {};
 int AIprog = 0;
 
-String[] AImoves = {};
-int AIprog = 0;
 
 void drawBoard(){
   int x;
@@ -363,14 +361,14 @@ String boardToLisp(){
 String getAIMove() throws IOException{
   
   String lispBoard = boardToLisp();
-  String[] cmd = {"/usr/local/bin/clisp", "alphabeta.lsp", str(depth[pTurn?0:1]), lispBoard, (players==1 || !pTurn) ?"T":"Nil"};
+  String[] cmd = {"clisp", "alphabeta.lsp", str(depth[pTurn?0:1]), lispBoard, (players==1 || !pTurn) ?"T":"Nil"};
   Process pr = rt.exec(cmd, null, new File(path));
   InputStream stdout = pr.getInputStream(); 
   Scanner scan = new Scanner(stdout);
   String ans = "";
   while(scan.hasNextLine()){
     ans = scan.nextLine();
-    //println(ans);
+    println(ans);
 
   }
   scan.close();
