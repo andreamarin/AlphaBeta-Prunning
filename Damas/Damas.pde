@@ -1,9 +1,11 @@
+
 int[] depth = {3,3}; // blue, red
 String[] names = {"BLUE", "HAL"}; // blue, red
 boolean pTurn = false; //blue starts
 int players = 0;
 boolean numbering = true;
 String path = "/Users/alex/Documents/6Semestre/AI/Tarea3";
+
 
 // Colors: 
 /*
@@ -28,7 +30,6 @@ int[] C4 = {0, 155, 100}; //TILE_1
 int[] C5 = {230,230,50}; //CROWN
 
 
-//===================================================================================//
 
 import java.io.OutputStreamWriter;
 import java.util.Scanner;
@@ -36,10 +37,15 @@ import java.util.Scanner;
 PShape crown;
 int[] board;
 int activePeg = -1;
+
 boolean twoPlayers = false;
+
 int selectedPeg = -1;
 int[][][] diagonals;
 Runtime rt = Runtime.getRuntime();
+String[] AImoves = {};
+int AIprog = 0;
+
 String[] AImoves = {};
 int AIprog = 0;
 
@@ -57,6 +63,7 @@ void drawBoard(){
     }
     rect(x*50,y*50,50,50);
     fill(0);
+
     if(numbering && (x+y)%2==1)
       text(str(i/2), x*50+2, y*50+8);
   }
@@ -220,6 +227,7 @@ void mouseClicked(){
         ind = i;
       }
     }
+
     int[] canMove = canEat();
     int s=0;
     for(int i = 0; i<32; i++){
@@ -236,6 +244,7 @@ void mouseClicked(){
             println(selectedPeg+" to "+ind);
             move(selectedPeg, diag[0], board, false);
             move(diag[0], ind, board, false); // does nothing if not eating
+
             if(eats && calcEat(ind, board) != 0){
               println("Ate "+diag[0]);
               selectedPeg = ind;
@@ -244,6 +253,7 @@ void mouseClicked(){
             else{
               selectedPeg = -1;
               pTurn = !pTurn;
+
               println("Turn ended.\n");
               if(players == 2){
                 println(names[pTurn?0:1]+"'s turn");
@@ -257,6 +267,7 @@ void mouseClicked(){
           }
         } 
       }else{
+
         if(pTurn ? board[ind]<0 : board[ind]>0){
           int[] m = getMoves(ind);
           boolean hasMoves = false;
@@ -282,7 +293,7 @@ void mouseClicked(){
             println("Peg "+ind+": No moves available");
           }
         }else{
-          println("Pos "+ind+": Not your peg"); 
+          println("Peg "+ind+": Not your peg"); 
         }
       }
     }else{
@@ -305,6 +316,7 @@ void mouseClicked(){
             println("Turn ended.\n");
             if(players == 2){
               println(names[pTurn?0:1]+"'s turn");
+
             }
           }
           move(ind, ind, board, true); //convert to King
@@ -336,6 +348,7 @@ void moveAI(int m, int n){
       break;
     }
   }
+
 }
 
 String boardToLisp(){
@@ -358,6 +371,7 @@ String getAIMove() throws IOException{
   while(scan.hasNextLine()){
     ans = scan.nextLine();
     //println(ans);
+
   }
   scan.close();
  
@@ -392,6 +406,7 @@ void setup(){
 
   names[0] += players == 0 ? depth[0] + "000":"";
   names[1] += players <= 1 ? depth[1] + "000":"";
+
   //board[9] = -1;  
   //board[30] = 0;
   
@@ -428,6 +443,7 @@ void draw(){
     try{
       if(AIprog == 0){
         println(names[pTurn?0:1]+" plays...  ");
+
         String m = getAIMove();
         AImoves = m.replace(".","").replace("  "," ").split(" ");
         AImoves[0] = AImoves[0].substring(1);
@@ -448,8 +464,6 @@ void draw(){
     catch(IOException e){println(e);}  
   }
 }
-
-
 
 
 int[][][] makeDiag(){
